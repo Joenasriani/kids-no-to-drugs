@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Hero Quest: The Healthy Choice</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-gradient: linear-gradient(135deg, rgb(255, 222, 233) 0%, rgb(181, 255, 252) 100%);
+}
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  height: 100dvh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.header-font, .btn-font { font-family: 'Fredoka One', cursive; }
+.card-shadow { box-shadow: 0 1vh 0px rgba(0, 0, 0, 0.1); }
+.choice-btn { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); touch-action: manipulation; }
+.choice-btn:active { transform: translateY(0.5vh); border-bottom-width: 2px; }
+
+/* Dynamic Scaling based on screen size */
+.game-container {
+  width: 95vw;
+  max-width: 1000px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.floating { animation: floating 3s ease-in-out infinite; }
+@keyframes floating {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5vh); }
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  animation: fall 3s linear forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+.hidden { display: none; }
+
+/* Landscape Mobile Fixes */
+@media (max-height: 500px) {
+  .landscape-row { display: flex; flex-direction: row; align-items: center; gap: 2rem; text-align: left; }
+  .landscape-shrink { font-size: 1.25rem !important; line-height: 1.2 !important; }
+  .landscape-hide { display: none !important; }
+  .landscape-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .landscape-emoji { font-size: 4rem !important; margin: 0 !important; }
+  .card-padding { padding: 1.5rem !important; }
+}
+
+/* TV & Large Display Scaling */
+@media (min-width: 1600px) {
+  .game-container { max-width: 1200px; }
+  .tv-text-lg { font-size: 4rem !important; }
+  .tv-text-md { font-size: 2.5rem !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <!-- START SCREEN -->
+  <div id="start-screen" class="bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-12 text-center card-shadow border-[0.5vh] border-yellow-400 relative card-padding">
+    <button onclick="toggleFullScreen()" class="absolute top-4 right-4 text-gray-300 hover:text-blue-500 landscape-hide">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M160,48a8,8,0,0,1,8-8h40a8,8,0,0,1,8,8V88a8,8,0,0,1-16,0V56H168A8,8,0,0,1,160,48ZM88,200H48V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm128-40a8,8,0,0,0-8,8v32H176a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,216,160ZM48,96a8,8,0,0,0,8-8V56H88a8,8,0,0,0,0-16H48a8,8,0,0,0-8,8V88A8,8,0,0,0,48,96Z"></path></svg>
+    </button>
+    <div class="landscape-row">
+      <div class="text-[15vh] mb-4 floating landscape-emoji">🦸‍♂️</div>
+      <div>
+        <h1 class="header-font text-3xl sm:text-6xl text-blue-600 mb-2 sm:mb-4 tracking-tight uppercase tv-text-lg">HERO QUEST</h1>
+        <p class="text-lg sm:text-2xl text-gray-600 mb-6 sm:mb-10 font-bold landscape-shrink tv-text-md">10 Random Challenges inside!<br class="landscape-hide"> Are you ready to save your brain?</p>
+        <button onclick="handleStartClick()" class="btn-font w-full sm:w-auto bg-pink-500 hover:bg-pink-400 text-white text-xl sm:text-3xl px-12 py-4 rounded-full border-b-[0.8vh] border-pink-700 active:border-b-0 uppercase tv-text-md">START QUEST</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="question-screen" class="hidden bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-center card-shadow border-[0.5vh] border-blue-400 card-padding">
+    <div class="flex justify-between items-center mb-4 gap-4">
+      <span id="progress-text" class="text-blue-500 font-black text-xs sm:text-lg uppercase">Question 1/10</span>
+      <div class="flex-1 bg-gray-200 h-3 rounded-full overflow-hidden">
+        <div id="progress-bar" class="bg-blue-400 h-full transition-all duration-500 w-[10%]"></div>
+      </div>
+    </div>
+    
+    <div class="landscape-row">
+      <div id="q-emoji" class="text-[12vh] mb-2 sm:mb-6 landscape-emoji">🤔</div>
+      <div class="flex-1">
+        <h2 id="question-text" class="text-lg sm:text-3xl text-gray-800 mb-4 sm:mb-8 font-black leading-tight landscape-shrink tv-text-md">Loading...</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 landscape-grid">
+          <button onclick="handleAnswerClick(0)" id="btn-0" class="choice-btn btn-font bg-emerald-400 hover:bg-emerald-300 text-white p-4 sm:p-8 rounded-2xl sm:rounded-3xl text-sm sm:text-xl border-b-[0.6vh] border-emerald-600 shadow-lg tv-text-md">Option A</button>
+          <button onclick="handleAnswerClick(1)" id="btn-1" class="choice-btn btn-font bg-orange-400 hover:bg-orange-300 text-white p-4 sm:p-8 rounded-2xl sm:rounded-3xl text-sm sm:text-xl border-b-[0.6vh] border-orange-600 shadow-lg tv-text-md">Option B</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen" class="hidden bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-center card-shadow border-[0.5vh] border-purple-400 card-padding">
+    <div class="landscape-row justify-center">
+      <div class="text-[12vh] mb-2 landscape-emoji">🏆</div>
+      <div>
+        <h1 class="header-font text-3xl sm:text-6xl text-purple-600 uppercase tv-text-lg">SUPER HERO</h1>
+        <p class="text-lg sm:text-2xl text-gray-600 mb-4 font-bold tv-text-md">Score: <span id="final-score" class="text-pink-500">0</span>/10</p>
+      </div>
+    </div>
+    
+    <div class="bg-yellow-50 p-4 sm:p-8 rounded-2xl border-2 sm:border-4 border-dashed border-yellow-400 mb-6 max-w-2xl mx-auto">
+      <p class="text-sm sm:text-xl text-gray-700 leading-relaxed font-bold landscape-shrink tv-text-md">
+        Your brain is your superpower! Drugs are like bad viruses that crash your system. Stay smart, and always say NO to mystery things. Heroes stay strong!
+      </p>
+    </div>
+    <button onclick="handleResetClick()" class="btn-font w-full sm:w-auto bg-blue-500 hover:bg-blue-400 text-white text-lg sm:text-2xl px-12 py-4 rounded-full border-b-[0.6vh] border-blue-700 uppercase tv-text-md">PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+const clickAudio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA=");
+
+function playClick() { clickAudio.currentTime = 0; clickAudio.play().catch(() => {}); }
+function toggleFullScreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+  else if (document.exitFullscreen) document.exitFullscreen();
+}
+
+const allQuestions = [
+  {q: "Stranger offers 'magic candy'?", o: ["Say NO way!", "Try a tiny bit."], c: 0, e: "🍬"},
+  {q: "Best fuel for your brain?", o: ["Mystery liquid.", "Water and fruit."], c: 1, e: "🧠"},
+  {q: "What do drugs do to your body?", o: ["Gunk it with slime.", "Make it faster."], c: 0, e: "🤢"},
+  {q: "Who to talk to if worried?", o: ["A random bird.", "Parents/Teachers."], c: 1, e: "🫂"},
+  {q: "Who gives you medicine?", o: ["Trusted adults.", "Kids at school."], c: 0, e: "👨‍⚕️"},
+  {q: "Drugs and your heart?", o: ["Scary, bad rhythm.", "Shiny disco ball."], c: 0, e: "💓"},
+  {q: "A real friend would...", o: ["Respect your NO.", "Trick you."], c: 0, e: "🤝"},
+  {q: "Trash in your robot body?", o: ["System breaks.", "Master chef."], c: 0, e: "🤖"},
+  {q: "Drug Free means...", o: ["In control!", "Bored forever."], c: 0, e: "✨"},
+  {q: "Future hero mission?", o: ["Stay drug-free.", "Mystery item hunt."], c: 0, e: "🚀"},
+  {q: "Found a needle in the park?", o: ["Don't touch!", "Pick it up."], c: 0, e: "📍"},
+  {q: "Friend asks you to smoke?", o: ["Say NO & walk away.", "Do it to be cool."], c: 0, e: "🚭"},
+  {q: "Smelling markers or glue?", o: ["Bad for brain.", "Helps study."], c: 0, e: "🖍️"},
+  {q: "Found a 'secret potion'?", o: ["Don't drink!", "Yummy power up."], c: 0, e: "🧪"},
+  {q: "Brain on drugs is like...", o: ["Broken computer.", "Super computer."], c: 0, e: "💻"},
+  {q: "Called 'chicken' for NO?", o: ["Heroes are brave.", "Must prove them."], c: 0, e: "🐔"},
+  {q: "Not your medicine?", o: ["Keep away!", "Share with friends."], c: 0, e: "💊"},
+  {q: "Why keep body clean?", o: ["Strong and ready.", "To smell like socks."], c: 0, e: "🧼"},
+  {q: "Drugs make you lose...", o: ["Balance and mind.", "Dirty laundry."], c: 0, e: "⚖️"},
+  {q: "Best way to feel happy?", o: ["Play with friends.", "Mystery pills."], c: 0, e: "🎈"},
+  {q: "Found a pill on floor?", o: ["Tell an adult.", "Eat like a snack."], c: 0, e: "🍪"},
+  {q: "Hero's secret weapon?", o: ["Smart brain.", "Bag of drugs."], c: 0, e: "🛡️"},
+  {q: "How to run fast?", o: ["Health/Exercise.", "Smoking."], c: 0, e: "🏃"},
+  {q: "Drugs in your blood?", o: ["Oil spill in ocean.", "Rainbows in sky."], c: 0, e: "🌊"},
+  {q: "Can drugs change you?", o: ["Yes, badly.", "No, not at all."], c: 0, e: "🎭"},
+  {q: "Lungs like what?", o: ["Fresh air.", "Grey smoke."], c: 0, e: "🫁"},
+  {q: "Bully offers drugs?", o: ["Stand tall, say NO.", "Agree to fit in."], c: 0, e: "😤"},
+  {q: "Strong muscles from...", o: ["Food and sports.", "Vaping."], c: 0, e: "💪"},
+  {q: "A healthy hero has...", o: ["Energy & bright eyes.", "Grey skin."], c: 0, e: "👀"},
+  {q: "Mystery powder?", o: ["Danger, stay away.", "Sprinkle on food."], c: 0, e: "🧂"},
+  {q: "Handle pressure?", o: ["Breathe & say NO.", "Give in."], c: 0, e: "🧘"},
+  {q: "Smoking makes teeth...", o: ["Yellow & stinky.", "White."], c: 0, e: "🦷"},
+  {q: "Drugs at a party?", o: ["Call home to leave.", "Stay and hide."], c: 0, e: "🎉"},
+  {q: "Your future is...", o: ["Bright/Drug-free.", "Cloudy/Drugs."], c: 0, e: "🌅"},
+  {q: "Smart choice is...", o: ["Think for myself.", "Follow the crowd."], c: 0, e: "💡"},
+  {q: "Memory on drugs?", o: ["Forgetful.", "100% memory."], c: 0, e: "📔"},
+  {q: "Healthy hobbies?", o: ["Reading/Sports.", "Sitting in smoke."], c: 0, e: "🏀"},
+  {q: "Real fan wants you...", o: ["Safe and healthy.", "Taking drugs."], c: 0, e: "📣"},
+  {q: "Drugs make you react...", o: ["Too slow.", "Like a ninja."], c: 0, e: "🐢"},
+  {q: "Hero's life is...", o: ["Fun choices.", "Drug controlled."], c: 0, e: "🌈"},
+  {q: "Curious about drugs?", o: ["Ask a trusted adult.", "Try it alone."], c: 0, e: "🔍"},
+  {q: "Drugs cost...", o: ["Happiness/Health.", "Nothing."], c: 0, e: "💸"},
+  {q: "Brain gears need...", o: ["Smart thoughts.", "Sticky drugs."], c: 0, e: "⚙️"},
+  {q: "Hero power from...", o: ["Your heart.", "Smoke clouds."], c: 0, e: "❤️"},
+  {q: "Cigarettes make skin...", o: ["Wrinkly/Old.", "Soft/Young."], c: 0, e: "👵"},
+  {q: "See a drug ad?", o: ["It's a lie.", "Believe it all."], c: 0, e: "📺"},
+  {q: "Staying safe means...", o: ["Watching out.", "Closing eyes."], c: 0, e: "🛡️"},
+  {q: "Hero's drink?", o: ["Water.", "Beer/Wine."], c: 0, e: "🥤"},
+  {q: "Drugs make sleep...", o: ["Restless.", "Perfect."], c: 0, e: "🛌"},
+  {q: "The best YOU is...", o: ["Drug-Free!", "Trying everything."], c: 0, e: "🥇"},
+  /* New Educational Questions */
+  {q: "Drugs make your brain signals go...", o: ["Mixed up and crazy.", "Clear and fast."], c: 0, e: "📡"},
+  {q: "What happens to your money if you use drugs?", o: ["You waste it on bad stuff.", "You buy more toys."], c: 0, e: "💰"},
+  {q: "Drugs can make you lose interest in...", o: ["Hobbies and friends.", "Vegetables."], c: 0, e: "🎨"},
+  {q: "Using drugs is like putting what in your eyes?", o: ["A thick dark fog.", "Magic glasses."], c: 0, e: "🌫️"},
+  {q: "How does smoking change your breath?", o: ["It smells like trash.", "It smells like mint."], c: 0, e: "🤮"},
+  {q: "Drugs can make it hard for your brain to...", o: ["Learn new things.", "Forget chores."], c: 0, e: "📚"},
+  {q: "What happens to your 'Hero Focus' on drugs?", o: ["It disappears.", "It becomes 10x stronger."], c: 0, e: "🎯"},
+  {q: "Drugs make your body feel...", o: ["Weak and tired.", "Like a superhero."], c: 0, e: "😴"},
+  {q: "Is it easy to stop once you start drugs?", o: ["No, it's very hard!", "Yes, it's super easy."], c: 0, e: "🔗"},
+  {q: "Real power comes from...", o: ["Being healthy.", "A mystery pill."], c: 0, e: "⚡"},
+  {q: "Who is really in charge when someone uses drugs?", o: ["The bad drug is.", "The person is."], c: 0, e: "🎮"},
+  {q: "Drugs make your skin look...", o: ["Sick and dull.", "Glowing and tan."], c: 0, e: "🧟"},
+  {q: "How do drugs affect your sports skills?", o: ["You become clumsy.", "You win every race."], c: 0, e: "⚽"},
+  {q: "Drugs are like 'glitches' for your...", o: ["Nervous system.", "Video games."], c: 0, e: "📟"},
+  {q: "Saying NO to drugs makes you...", o: ["A brave leader.", "A scared kitten."], c: 0, e: "🦁"},
+  {q: "What happens to your dreams on drugs?", o: ["They get harder to reach.", "They come true faster."], c: 0, e: "☁️"},
+  {q: "Drugs can make your family feel...", o: ["Worried and sad.", "Proud and happy."], c: 0, e: "😢"},
+  {q: "A healthy heart beats best with...", o: ["Fresh air and play.", "Pills and smoke."], c: 0, e: "🫀"},
+  {q: "What do drugs do to your appetite?", o: ["Make you feel sick.", "Help you grow tall."], c: 0, e: "🍎"},
+  {q: "Hero choice: Water or mystery juice?", o: ["Pure Water!", "Mystery Juice."], c: 0, e: "💧"},
+  {q: "Drugs take away your...", o: ["Freedom to choose.", "School homework."], c: 0, e: "🔓"}
+];
+
+let gameQuestions = [], currentQ = 0, score = 0;
+
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function handleStartClick() { playClick(); startGame(); }
+function handleAnswerClick(i) { playClick(); checkAnswer(i); }
+function handleResetClick() { playClick(); location.reload(); }
+
+function startGame() {
+  gameQuestions = shuffle([...allQuestions]).slice(0, 10);
+  currentQ = score = 0;
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("question-screen").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion() {
+  const data = gameQuestions[currentQ];
+  document.getElementById("question-text").innerText = data.q;
+  document.getElementById("btn-0").innerText = data.o[0];
+  document.getElementById("btn-1").innerText = data.o[1];
+  document.getElementById("q-emoji").innerText = data.e;
+  document.getElementById("progress-text").innerText = `Question ${currentQ + 1}/10`;
+  document.getElementById("progress-bar").style.width = `${(currentQ + 1) * 10}%`;
+}
+
+function checkAnswer(i) {
+  if (i === gameQuestions[currentQ].correct) { score++; for(let k=0; k<8; k++) createConfetti(); }
+  currentQ++;
+  if (currentQ < 10) setTimeout(showQuestion, 400);
+  else setTimeout(showEnd, 600);
+}
+
+function showEnd() {
+  document.getElementById("question-screen").classList.add("hidden");
+  document.getElementById("end-screen").classList.remove("hidden");
+  document.getElementById("final-score").innerText = score;
+  for(let k=0; k<40; k++) setTimeout(createConfetti, k * 80);
+}
+
+function createConfetti() {
+  const colors = ["#FF0055", "#00FFCC", "#FFFF00", "#FF9900", "#AA00FF", "#33CCFF"];
+  const c = document.createElement("div");
+  c.className = "confetti";
+  c.style.left = (Math.random() * 100) + "vw";
+  c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+  c.style.top = "-20px";
+  c.style.borderRadius = Math.random() > 0.5 ? "50%" : "0";
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), 3000);
+}
+</script>
+</body>
+</html>
