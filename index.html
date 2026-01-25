@@ -22,19 +22,32 @@ body {
   justify-content: center;
   overflow: hidden;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  line-height: 1.6;
 }
-.header-font, .btn-font { font-family: 'Fredoka One', cursive; }
+.header-font, .btn-font { 
+  font-family: 'Fredoka One', cursive; 
+  letter-spacing: 0.12em;
+}
 .card-shadow { box-shadow: 0 1vh 0px rgba(0, 0, 0, 0.2); }
-.choice-btn { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); touch-action: manipulation; background-color: var(--primary-blue); color: white; }
+.choice-btn { 
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  touch-action: manipulation; 
+  background-color: var(--primary-blue); 
+  color: white !important;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+}
 .choice-btn:active { transform: translateY(0.5vh); border-bottom-width: 2px; }
 
 .game-container {
-  width: 95vw;
-  max-width: 1000px;
-  max-height: 95vh;
+  width: 90vw;
+  max-width: 1200px;
+  height: 90vh;
+  max-height: 850px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
 }
 
 .floating { animation: floating 3s ease-in-out infinite; }
@@ -43,98 +56,127 @@ body {
   50% { transform: translateY(-1.5vh); }
 }
 
-.hidden { display: none; }
+.hidden { display: none !important; }
 
-@media (max-height: 500px) {
-  .landscape-row { display: flex; flex-direction: row; align-items: center; gap: 2rem; text-align: left; }
-  .landscape-shrink { font-size: 1.1rem !important; line-height: 1.1 !important; }
-  .landscape-hide { display: none !important; }
-  .landscape-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-  .landscape-emoji { font-size: 3rem !important; margin: 0 !important; }
-  .card-padding { padding: 1rem !important; }
+.custom-scrollbar::-webkit-scrollbar { width: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--primary-yellow); border-radius: 10px; }
+
+@media (min-width: 1400px) {
+  .game-container { max-width: 1400px; max-height: 900px; }
 }
 
-@media (min-width: 1600px) {
-  .game-container { max-width: 1200px; }
-  .tv-text-lg { font-size: 4rem !important; }
-  .tv-text-md { font-size: 2.5rem !important; }
+@media (orientation: landscape) {
+  .landscape-row { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 4vw; text-align: left; }
+  .landscape-emoji { font-size: 20vh !important; margin: 0 !important; }
+  .landscape-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 2vh !important; }
+  .landscape-hide { display: none !important; }
+  .card-padding { padding: 3vh !important; }
+  .text-scale { font-size: 3.2vh !important; line-height: 1.4 !important; }
+  .title-scale { font-size: 7vh !important; }
 }
 </style>
 </head>
 <body>
 
-<div class="fixed top-4 right-4 z-50">
-  <button onclick="toggleFullScreen()" class="bg-white p-3 rounded-full shadow-lg hover:bg-yellow-100 transition-colors">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="rgb(79, 70, 229)" viewBox="0 0 256 256"><path d="M160,48a8,8,0,0,1,8-8h40a8,8,0,0,1,8,8V88a8,8,0,0,1-16,0V56H168A8,8,0,0,1,160,48ZM88,200H48V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm128-40a8,8,0,0,0-8,8v32H176a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,216,160ZM48,96a8,8,0,0,0,8-8V56H88a8,8,0,0,0,0-16H48a8,8,0,0,0-8,8V88A8,8,0,0,0,48,96Z"></path></svg>
+<div class="fixed top-6 right-6 z-50">
+  <button onclick="toggleFullScreen()" class="bg-white p-4 rounded-full shadow-lg hover:bg-yellow-100 transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="rgb(79, 70, 229)" viewBox="0 0 256 256"><path d="M160,48a8,8,0,0,1,8-8h40a8,8,0,0,1,8,8V88a8,8,0,0,1-16,0V56H168A8,8,0,0,1,160,48ZM88,200H48V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm128-40a8,8,0,0,0-8,8v32H176a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,216,160ZM48,96a8,8,0,0,0,8-8V56H88a8,8,0,0,0,0-16H48a8,8,0,0,0-8,8V88A8,8,0,0,0,48,96Z"></path></svg>
   </button>
 </div>
 
-<div class="fixed bottom-4 right-4 z-50">
+<div class="fixed bottom-6 right-6 z-50">
   <button onclick="handleResetClick()" class="bg-white p-4 rounded-full shadow-lg hover:bg-yellow-100 transition-colors flex items-center justify-center border-4 border-yellow-400">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="rgb(79, 70, 229)" viewBox="0 0 256 256"><path d="M240,128a112,112,0,1,1-212.71-56h23.44l-20.36,20.36a8,8,0,0,0,11.32,11.32l32-32a8,8,0,0,0,0-11.32l-32-32A8,8,0,0,0,30.34,39.66L51.29,60.61A128,128,0,1,0,256,128Z"></path></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="rgb(79, 70, 229)" viewBox="0 0 256 256"><path d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-16,0V115.55a16,16,0,0,1,5.17-11.78l80-75.48a16,16,0,0,1,21.66,0l80,75.48A16,16,0,0,1,224,115.55Z"></path></svg>
   </button>
 </div>
 
 <div class="game-container">
-  <div id="start-screen" class="bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-12 text-center card-shadow border-8 border-yellow-400 relative card-padding">
+  <!-- START SCREEN -->
+  <div id="start-screen" class="bg-white rounded-[3.5rem] p-8 sm:p-16 text-center card-shadow border-8 border-yellow-400 card-padding flex flex-col justify-center h-full">
     <div class="landscape-row">
-      <div class="text-[15vh] mb-4 floating landscape-emoji">🦸‍♂️</div>
-      <div>
-        <h1 class="header-font text-3xl sm:text-6xl text-indigo-600 mb-2 sm:mb-4 tracking-tight uppercase tv-text-lg">HERO MISSION</h1>
-        <p class="text-lg sm:text-2xl text-gray-600 mb-6 sm:mb-10 font-bold landscape-shrink tv-text-md">10 Random Challenges inside!<br class="landscape-hide"> Protect your brain and stay safe.</p>
-        <button onclick="handleStartClick()" class="btn-font w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white text-xl sm:text-3xl px-12 py-4 rounded-full border-b-[0.8vh] border-indigo-800 active:border-b-0 uppercase tv-text-md">START MISSION</button>
+      <div class="text-[18vh] mb-4 floating landscape-emoji">🦸‍♂️</div>
+      <div class="flex flex-col items-center justify-center flex-1">
+        <h1 class="header-font text-4xl sm:text-7xl text-indigo-600 mb-4 tracking-widest uppercase title-scale">HERO MISSION</h1>
+        <p class="text-xl sm:text-3xl text-gray-600 mb-8 font-bold leading-relaxed text-scale">10 Random Challenges inside!<br class="landscape-hide"> Protect your brain and stay safe.</p>
+        <button onclick="handleStartClick()" class="btn-font w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white text-xl sm:text-3xl px-12 py-6 rounded-full border-b-[1vh] border-indigo-900 active:border-b-0 uppercase shadow-xl">START MISSION</button>
       </div>
     </div>
   </div>
 
-  <div id="question-screen" class="hidden bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-center card-shadow border-8 border-yellow-400 card-padding">
-    <div class="flex justify-between items-center mb-4 gap-4">
-      <span id="progress-text" class="text-indigo-600 font-black text-xs sm:text-lg uppercase">Mission 1/10</span>
-      <div class="flex-1 bg-gray-200 h-3 rounded-full overflow-hidden">
+  <!-- QUESTION SCREEN -->
+  <div id="question-screen" class="hidden bg-white rounded-[3.5rem] p-8 sm:p-14 text-center card-shadow border-8 border-yellow-400 card-padding flex flex-col h-full">
+    <div class="flex justify-between items-center mb-6 gap-6 flex-shrink-0">
+      <span id="progress-text" class="text-indigo-600 font-black text-lg sm:text-2xl uppercase tracking-widest whitespace-nowrap">Mission 1/10</span>
+      <div class="flex-1 bg-gray-200 h-5 rounded-full overflow-hidden border-2 border-gray-100">
         <div id="progress-bar" class="bg-indigo-500 h-full transition-all duration-500 w-[10%]"></div>
       </div>
     </div>
     
-    <div id="game-logic-area">
+    <div id="game-logic-area" class="flex-1 flex flex-col justify-center">
       <div class="landscape-row">
-        <div id="q-emoji" class="text-[12vh] mb-2 sm:mb-6 landscape-emoji">🤔</div>
+        <div id="q-emoji" class="text-[14vh] mb-4 landscape-emoji">🤔</div>
         <div class="flex-1">
-          <h2 id="question-text" class="text-lg sm:text-3xl text-gray-800 mb-4 sm:mb-8 font-black leading-tight landscape-shrink tv-text-md">Loading...</h2>
-          <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 landscape-grid">
-            <button onclick="handleAnswerClick(0)" id="btn-0" class="choice-btn btn-font p-4 sm:p-8 rounded-2xl sm:rounded-3xl text-sm sm:text-xl border-b-[0.6vh] border-indigo-900 shadow-lg tv-text-md">Option A</button>
-            <button onclick="handleAnswerClick(1)" id="btn-1" class="choice-btn btn-font p-4 sm:p-8 rounded-2xl sm:rounded-3xl text-sm sm:text-xl border-b-[0.6vh] border-indigo-900 shadow-lg tv-text-md">Option B</button>
+          <h2 id="question-text" class="text-2xl sm:text-4xl text-gray-800 mb-8 font-black leading-tight tracking-tight text-scale">Loading...</h2>
+          <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10 landscape-grid">
+            <button onclick="handleAnswerClick(0)" id="btn-0" class="choice-btn btn-font p-6 sm:p-10 rounded-[2.5rem] text-xl sm:text-3xl border-b-[1vh] border-indigo-900 shadow-2xl uppercase">Option A</button>
+            <button onclick="handleAnswerClick(1)" id="btn-1" class="choice-btn btn-font p-6 sm:p-10 rounded-[2.5rem] text-xl sm:text-3xl border-b-[1vh] border-indigo-900 shadow-2xl uppercase">Option B</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="end-screen" class="hidden bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-center card-shadow border-8 border-yellow-400 card-padding">
-    <div class="landscape-row justify-center">
-      <div id="end-emoji" class="text-[12vh] mb-2 landscape-emoji">🏆</div>
-      <div>
-        <h1 class="header-font text-3xl sm:text-5xl text-indigo-600 uppercase tv-text-lg leading-tight">MISSION COMPLETE</h1>
-        <p class="text-lg sm:text-2xl text-gray-600 mb-4 font-bold tv-text-md">Score: <span id="final-score" class="text-indigo-600">0</span>/10</p>
+  <!-- END SCREEN -->
+  <div id="end-screen" class="hidden bg-white rounded-[3.5rem] p-8 sm:p-12 text-center card-shadow border-8 border-yellow-400 card-padding flex flex-col justify-between h-full">
+    <!-- Header Section -->
+    <div class="landscape-row justify-center items-center flex-shrink-0">
+      <div id="end-emoji" class="text-[12vh] sm:text-[15vh] landscape-emoji">🏆</div>
+      <div class="sm:ml-8 flex flex-col justify-center">
+        <h1 class="header-font text-3xl sm:text-6xl text-indigo-600 uppercase tracking-widest leading-none title-scale">MISSION COMPLETE</h1>
+        <p class="text-2xl sm:text-4xl text-gray-600 mt-2 font-bold">Score: <span id="final-score" class="text-indigo-600">0</span>/10</p>
       </div>
     </div>
     
-    <div class="bg-indigo-50 p-4 sm:p-8 rounded-2xl border-4 border-dashed border-yellow-400 mb-6 max-w-2xl mx-auto">
-      <div class="header-font text-lg text-indigo-800 mb-2 uppercase text-left">Final Report:</div>
-      <p id="dynamic-advice" class="text-sm sm:text-xl text-gray-700 leading-relaxed font-bold landscape-shrink tv-text-md text-center">
+    <!-- Dynamic Report Section - Constrained to prevent overflow -->
+    <div class="bg-indigo-50 p-6 sm:p-10 rounded-[3rem] border-4 border-dashed border-yellow-400 max-w-4xl mx-auto flex-1 my-6 overflow-y-auto custom-scrollbar flex flex-col justify-center">
+      <div class="header-font text-lg sm:text-2xl text-indigo-800 mb-3 uppercase text-center tracking-widest">Final Briefing:</div>
+      <p id="dynamic-advice" class="text-xl sm:text-3xl text-gray-700 leading-relaxed font-bold text-center text-scale">
       </p>
     </div>
-    <button onclick="handleResetClick()" class="btn-font w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white text-lg sm:text-2xl px-12 py-4 rounded-full border-b-[0.8vh] border-indigo-800 active:border-b-0 uppercase tv-text-md">NEW MISSION</button>
+
+    <!-- Footer Section -->
+    <div class="flex-shrink-0">
+      <button onclick="handleResetClick()" class="btn-font w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white text-xl sm:text-3xl px-12 py-5 rounded-full border-b-[1vh] border-indigo-800 active:border-b-0 uppercase shadow-xl">NEW MISSION</button>
+    </div>
   </div>
 </div>
 
 <script>
 const clickAudio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA=");
 
+let idleTimeout;
+const IDLE_LIMIT = 3 * 60 * 1000;
+
 function playClick() { clickAudio.currentTime = 0; clickAudio.play().catch(() => {}); }
+
 function toggleFullScreen() {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
   else if (document.exitFullscreen) document.exitFullscreen();
 }
+
+function resetIdleTimer() {
+  clearTimeout(idleTimeout);
+  if (document.getElementById("start-screen").classList.contains("hidden")) {
+    idleTimeout = setTimeout(() => {
+      handleResetClick();
+    }, IDLE_LIMIT);
+  }
+}
+
+['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+  document.addEventListener(evt, resetIdleTimer, true);
+});
 
 const allQuestions = [
   {q: "Someone says a 'vape' is just flavored steam. What's the truth?", o: ["It has harmful chemicals.", "It's just water vapor."], c: 0, e: "💨", advice: "Vapes contain nicotine that hurts your growing brain."},
@@ -152,15 +194,16 @@ const allQuestions = [
   {q: "A healthy heart beats best with...", o: ["Fresh air and exercise.", "Vaping and pills."], c: 0, e: "🫀", advice: "Fresh air keeps your heart engine running strong."},
   {q: "Best 'Power-Up' for your brain?", o: ["Reading and puzzles.", "Energy drinks."], c: 0, e: "📚", advice: "Learning builds brain power more than any drug could."},
   {q: "Your lungs are like...", o: ["Pink sponges for air.", "Metal tubes."], c: 0, e: "🫁", advice: "Lungs need clean air. Smoke and vapes clog them."},
-  {q: "Who is in charge of your body?", o: ["I am!", "People offering items."], c: 0, e: "👑", advice: "You're the captain of your body. Stay in charge!"},
+  {q: "Who is in charge of your body?", o: ["I am!", "People offering items."], c: 0, e: "👑", advice: "You're the captain of your body. Don't let others make unsafe choices for you."},
   {q: "How does smoking change your breath and teeth?", o: ["Bad breath and yellow teeth.", "White teeth."], c: 0, e: "🤢", advice: "Smoking stains your smile and causes bad breath."}
 ];
 
 let gameQuestions = [], currentQ = 0, score = 0, missedAdviceList = [];
 
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function handleStartClick() { playClick(); startGame(); }
-function handleAnswerClick(i) { playClick(); checkAnswer(i); }
+
+function handleStartClick() { playClick(); startGame(); resetIdleTimer(); }
+function handleAnswerClick(i) { playClick(); checkAnswer(i); resetIdleTimer(); }
 function handleResetClick() { playClick(); location.reload(); }
 
 function startGame() {
@@ -190,7 +233,6 @@ function checkAnswer(i) {
   } else {
     missedAdviceList.push(data.advice);
   }
-  
   currentQ++;
   if (currentQ < 10) showQuestion();
   else showEnd();
@@ -200,12 +242,9 @@ function showEnd() {
   document.getElementById("question-screen").classList.add("hidden");
   document.getElementById("end-screen").classList.remove("hidden");
   document.getElementById("final-score").innerText = score;
-  
   const advicePara = document.getElementById("dynamic-advice");
   const endEmoji = document.getElementById("end-emoji");
-  
   const advice = missedAdviceList[0] || "Your brain is your most powerful tool!";
-
   if (score >= 8) {
     endEmoji.innerText = "⭐";
     advicePara.innerText = `Outstanding Hero! You are so close to perfection. Remember: ${advice} Make it even better by staying focused!`;
