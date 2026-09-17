@@ -1,0 +1,10 @@
+# Hero Mission: The Healthy Choice
+
+Canonical play URL: https://kids-no-to-drugs.vercel.app/
+Repository: https://github.com/Joenasriani/kids-no-to-drugs
+
+This repository contains a randomized 10-question drug-prevention and personal-safety quiz game developed as part of a multi-game interactive children’s edutainment activation in the UAE.
+
+Each run samples 10 questions from a 17-question bank. Correct choices increment the score; incorrect choices store question-specific advice. The final screen reports a score out of 10 and generates a briefing from a score band plus the first missed advice item.
+
+The question/advice text is simplified game content rather than a complete medical, substance-use-prevention or public-health curriculum. The score is not a validated measure of health knowledge, risk, behavior or future substance use.
